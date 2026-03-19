@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HXopt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --black: #0a0a0a;
+        --gray-600: #555;
+        --gray-400: #999;
+        --gray-200: #e2e2e2;
+        --gray-100: #f5f5f5;
+        --gray-50: #fafafa;
+        --white: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--white);
+        color: var(--black);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── HEADER ─────────────────────────────────── */
+      header {
+        padding: 1.2rem 4%;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--white);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.3rem;
+        letter-spacing: -0.02em;
+      }
+      .logo em {
+        font-style: normal;
+        color: var(--gray-400);
+        font-weight: 400;
+      }
+      .header-meta {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+      }
+
+      /* ── LAYOUT ─────────────────────────────────── */
+      main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        flex: 1;
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        .result-panel {
+          border-left: none;
+          border-top: 1px solid var(--gray-200);
+        }
+      }
+
+      /* ── INPUT PANEL ────────────────────────────── */
+      .input-panel {
+        padding: 2.5rem 4%;
+        border-right: 1px solid var(--gray-200);
+        overflow-y: auto;
+      }
+      .panel-heading {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+      }
+      .panel-sub {
+        font-size: 0.78rem;
+        color: var(--gray-400);
+        margin-bottom: 2rem;
+      }
+
+      /* ── FIELD SECTIONS ─────────────────────────── */
+      .field-section {
+        margin-bottom: 1.8rem;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.9rem;
+      }
+      .section-title {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gray-600);
+        white-space: nowrap;
+      }
+      .section-rule {
+        flex: 1;
+        height: 1px;
+        background: var(--gray-200);
+      }
+      .section-badge {
+        font-family: "DM Mono", monospace;
+        font-size: 0.55rem;
+        letter-spacing: 0.06em;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        padding: 0.15rem 0.45rem;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+
+      /* ── INPUTS ─────────────────────────────────── */
+      .input-grid {
+        display: grid;
+        gap: 0.75rem;
+      }
+      .cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cols-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .cols-4 {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+      @media (max-width: 600px) {
+        .cols-3,
+        .cols-4 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .form-control {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      label {
+        font-size: 0.68rem;
+        font-weight: 500;
+        color: var(--gray-600);
+      }
+
+      input[type="number"],
+      select {
+        background: var(--gray-100);
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 0.5rem 0.65rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--black);
+        width: 100%;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        -moz-appearance: textfield;
+      }
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+      }
+
+      select {
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.8rem;
+        appearance: none;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.6rem center;
+        padding-right: 1.8rem;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--black);
+        background: var(--white);
+      }
+
+      input.optional::placeholder {
+        color: var(--gray-400);
+        font-size: 0.72rem;
+      }
+      input.optional:placeholder-shown {
+        background: var(--gray-50);
+        border: 1px dashed var(--gray-200);
+      }
+
+      /* ── PREDICT BUTTON ─────────────────────────── */
+      .btn-predict {
+        margin-top: 1.5rem;
+        width: 100%;
+        background: var(--black);
+        color: var(--white);
+        border: none;
+        border-radius: 4px;
+        padding: 0.9rem;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.88rem;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition:
+          opacity 0.15s,
+          transform 0.1s;
+      }
+      .btn-predict:hover {
+        opacity: 0.82;
+      }
+      .btn-predict:active {
+        transform: scale(0.99);
+      }
+      .btn-predict:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      /* ── RESULT PANEL ───────────────────────────── */
+      .result-panel {
+        padding: 2.5rem 4%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* clips the loading bar's pseudo-element */
+      }
+
+      /* ── LOADING BAR FIX ────────────────────────────────────────────
+         The bar is a full-width container sitting at the top of the panel.
+         The animated part is a ::after pseudo-element that slides through it.
+         overflow: hidden on .result-panel clips it cleanly.
+      ──────────────────────────────────────────────────────────────── */
+      .loading-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: transparent;
+        pointer-events: none;
+      }
+
+      .loading-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -40%;
+        width: 40%;
+        height: 100%;
+        background: var(--black);
+        border-radius: 0 2px 2px 0;
+      }
+
+      .loading-bar.active::after {
+        animation: barslide 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      @keyframes barslide {
+        0% {
+          left: -40%;
+        }
+        100% {
+          left: 140%;
+        }
+      }
+
+      /* ── STATE SYSTEM ───────────────────────────── */
+      .state {
+        display: none;
+      }
+      .state.active {
+        display: block;
+      }
+
+      /* Idle */
+      #state-idle {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--gray-400);
+      }
+      #state-idle .idle-glyph {
+        font-size: 2.8rem;
+        opacity: 0.15;
+        margin-bottom: 1.2rem;
+      }
+      #state-idle p {
+        font-size: 0.82rem;
+        line-height: 1.7;
+      }
+
+      /* Loading */
+      #state-loading {
+        text-align: center;
+        padding: 5rem 2rem;
+      }
+      .loading-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      .loading-sub {
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        margin-top: 0.6rem;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Result */
+      #state-result {
+        animation: fadeUp 0.4s ease;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-eyebrow {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.4rem;
+      }
+      .result-q {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(2.4rem, 5vw, 4.5rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: var(--black);
+      }
+      .result-unit {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        margin-top: 0.3rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Breakdown table */
+      .breakdown-head {
+        font-family: "DM Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.6rem;
+      }
+      .breakdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        margin-bottom: 1.5rem;
+      }
+      .breakdown-table td {
+        padding: 0.42rem 0.35rem;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+      }
+      .breakdown-table td:first-child {
+        color: var(--gray-600);
+        width: 42%;
+      }
+      .breakdown-table td:nth-child(2) {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      .breakdown-table td:last-child {
+        text-align: right;
+        width: 18%;
+      }
+
+      .badge {
+        display: inline-block;
+        font-family: "DM Mono", monospace;
+        font-size: 0.54rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.15rem 0.45rem;
+        border-radius: 2px;
+      }
+      .badge-you {
+        background: var(--black);
+        color: var(--white);
+      }
+      .badge-ai {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+      }
+
+      /* Other candidates */
+      .candidates-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .candidate-card {
+        background: var(--gray-100);
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .candidate-card:hover {
+        background: var(--gray-200);
+      }
+      .candidate-rank {
+        font-family: "DM Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.2rem;
+      }
+      .candidate-q {
+        font-family: "Syne", sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      /* Error */
+      #state-error {
+        text-align: center;
+        padding: 3rem 2rem;
+      }
+      .error-tag {
+        display: inline-block;
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        background: #fff0f0;
+        color: #cc0000;
+        padding: 0.3rem 0.8rem;
+        border-radius: 3px;
+        margin-bottom: 0.75rem;
+      }
+      .error-msg {
+        font-size: 0.82rem;
+        color: var(--gray-600);
+        line-height: 1.6;
+      }
+
+      /* ── ABOUT SECTION ─────────────────────────────────────────────── */
+      .about-section {
+        border-top: 1px solid var(--gray-200);
+        padding: 2.5rem 4%;
+        background: #fff;
+      }
+      .about-inner {
+        grid-template-columns: 1fr auto;
+        gap: 3rem;
+        align-items: start;
+        display: flex;
+        flex-direction: row;
+      }
+      .about-left {
+        width: 50%;
+      }
+      @media (max-width: 760px) {
+        .about-inner {
+          flex-direction: column;
+        }
+        .about-left {
+          width: 100%;
+        }
+      }
+      .about-kicker {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.75rem;
+      }
+      .about-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        letter-spacing: 0.01em;
+        line-height: 1.5;
+        color: var(--black);
+        max-width: 560px;
+        margin-bottom: 1rem;
+      }
+      .about-desc {
+        font-size: 0.78rem;
+        color: var(--gray-600);
+        line-height: 1.8;
+        max-width: 520px;
+        text-align: justify;
+      }
+
+      .about-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        min-width: 180px;
+      }
+      .meta-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .meta-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--gray-400);
+        margin-bottom: 0.1rem;
+      }
+      .meta-value {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--black);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .meta-value span {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 400;
+        color: var(--gray-400);
+        background: var(--gray-200);
+        padding: 0.1rem 0.4rem;
+        border-radius: 2px;
+      }
+      /* ── FOOTER ─────────────────────────────────── */
+      footer {
+        padding: 0.85rem 4%;
+        border-top: 1px solid var(--gray-200);
+        background: var(--white);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .footer-names {
+        display: flex;
+        gap: 1.5rem;
+      }
+      .footer-name {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--black);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .footer-name span {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--gray-400);
+      }
+      .footer-space {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.06em;
+        color: var(--gray-400);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">HXopt</div>
+      <div class="header-meta">Heat Exchanger Optimizer</div>
+    </header>
+
+    <main>
+      <!-- ── INPUT PANEL ─────────────────────────────────────────── -->
+      <div class="input-panel">
+        <div class="panel-heading">Design Parameters</div>
+        <div class="panel-sub">
+          Fill in what you know - leave anything blank and the AI will find the
+          best value for it.
+        </div>
+
+        <!-- Required -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Required</span>
+            <div class="section-rule"></div>
+          </div>
+          <div class="input-grid cols-2">
+            <div class="form-control">
+              <label>Tube Fluid</label>
+              <select id="tube_fluid">
+                <option value="oil" selected>Oil</option>
+                <option value="water">Water</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label>Shell Fluid</label>
+              <select id="shell_fluid">
+                <option value="water" selected>Water</option>
+                <option value="oil">Oil</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label>Target Q (W) — 0 to maximize</label>
+              <input type="number" id="target_Q" value="0" min="0" />
+            </div>
+            <div class="form-control">
+              <label>Search Trials</label>
+              <input
+                type="number"
+                id="n_trials"
+                value="1000"
+                min="500"
+                max="5000"
+                step="500"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Geometry -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Geometry</span>
+            <div class="section-rule"></div>
+            <span class="section-badge">Optional</span>
+          </div>
+          <div class="input-grid cols-3">
+            <div class="form-control">
+              <label>Shell Diameter (m)</label>
+              <input
+                type="number"
+                id="shell_diameter"
+                class="optional"
+                placeholder="0.52 – 0.58"
+                step="0.001"
+              />
+            </div>
+            <div class="form-control">
+              <label>Tube Outer Ø (m)</label>
+              <input
+                type="number"
+                id="tube_outer_diameter"
+                class="optional"
+                placeholder="0.023 – 0.027"
+                step="0.001"
+              />
+            </div>
+            <div class="form-control">
+              <label>Tube Inner Ø (m)</label>
+              <input
+                type="number"
+                id="tube_inner_diameter"
+                class="optional"
+                placeholder="0.019 – 0.023"
+                step="0.001"
+              />
+            </div>
+            <div class="form-control">
+              <label>Tube Length (m)</label>
+              <input
+                type="number"
+                id="tube_length"
+                class="optional"
+                placeholder="2.5 – 3.5"
+                step="0.1"
+              />
+            </div>
+            <div class="form-control">
+              <label>No. of Tubes</label>
+              <input
+                type="number"
+                id="number_of_tubes"
+                class="optional"
+                placeholder="18 – 25"
+              />
+            </div>
+            <div class="form-control">
+              <label>Tube Pitch (m)</label>
+              <input
+                type="number"
+                id="tube_pitch"
+                class="optional"
+                placeholder="0.030 – 0.035"
+                step="0.001"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Baffles -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Baffles</span>
+            <div class="section-rule"></div>
+            <span class="section-badge">Optional</span>
+          </div>
+          <div class="input-grid cols-2">
+            <div class="form-control">
+              <label>Baffle Spacing (m)</label>
+              <input
+                type="number"
+                id="baffle_spacing"
+                class="optional"
+                placeholder="0.15 – 0.25"
+                step="0.01"
+              />
+            </div>
+            <div class="form-control">
+              <label>No. of Baffles</label>
+              <input
+                type="number"
+                id="number_of_baffles"
+                class="optional"
+                placeholder="8 – 12"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Flow</span>
+            <div class="section-rule"></div>
+            <span class="section-badge">Optional</span>
+          </div>
+          <div class="input-grid cols-2">
+            <div class="form-control">
+              <label>Tube Mass Flow (kg/s)</label>
+              <input
+                type="number"
+                id="tube_mass_flow_rate"
+                class="optional"
+                placeholder="0.5 – 4.0"
+                step="0.1"
+              />
+            </div>
+            <div class="form-control">
+              <label>Shell Mass Flow (kg/s)</label>
+              <input
+                type="number"
+                id="shell_mass_flow_rate"
+                class="optional"
+                placeholder="0.5 – 3.0"
+                step="0.1"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Temperature</span>
+            <div class="section-rule"></div>
+            <span class="section-badge">Optional</span>
+          </div>
+          <div class="input-grid cols-4">
+            <div class="form-control">
+              <label>Tube In (K)</label>
+              <input
+                type="number"
+                id="tube_inlet_temp"
+                class="optional"
+                placeholder="400–450"
+              />
+            </div>
+            <div class="form-control">
+              <label>Tube Out (K)</label>
+              <input
+                type="number"
+                id="tube_outlet_temp"
+                class="optional"
+                placeholder="360–400"
+              />
+            </div>
+            <div class="form-control">
+              <label>Shell In (K)</label>
+              <input
+                type="number"
+                id="shell_inlet_temp"
+                class="optional"
+                placeholder="300–350"
+              />
+            </div>
+            <div class="form-control">
+              <label>Shell Out (K)</label>
+              <input
+                type="number"
+                id="shell_outlet_temp"
+                class="optional"
+                placeholder="350–380"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Material -->
+        <div class="field-section">
+          <div class="section-head">
+            <span class="section-title">Material</span>
+            <div class="section-rule"></div>
+            <span class="section-badge">Optional</span>
+          </div>
+          <div class="input-grid cols-2">
+            <div class="form-control">
+              <label>Tube Thermal Conductivity</label>
+              <select id="tube_thermal_conductivity">
+                <option value="auto">Auto — AI selects best</option>
+                <option value="16">16 W/mK — Carbon Steel</option>
+                <option value="205">205 W/mK — Aluminium</option>
+                <option value="385">385 W/mK — Copper</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-predict" id="predict-btn" onclick="runPrediction()">
+          Find Optimal Design
+        </button>
+      </div>
+
+      <!-- ── RESULT PANEL ──────────────────────────────────────────── -->
+      <div class="result-panel">
+        <div class="loading-bar" id="loading-bar"></div>
+
+        <div id="state-idle" class="state active">
+          <div class="idle-glyph">⬡</div>
+          <p>
+            Configure your known parameters<br />and click
+            <strong>Find Optimal Design</strong>.
+          </p>
+        </div>
+
+        <div id="state-loading" class="state">
+          <div class="loading-label">Sampling design space</div>
+          <div class="loading-sub">
+            Running optimization trials on the model
+          </div>
+        </div>
+
+        <div id="state-result" class="state">
+          <div class="result-eyebrow">Best Design Found</div>
+          <div class="result-q" id="result-q">—</div>
+          <div class="result-unit">Watts · Predicted Heat Transfer Rate</div>
+
+          <div class="breakdown-head">Parameter Breakdown</div>
+          <table class="breakdown-table" id="breakdown-table"></table>
+
+          <div
+            class="breakdown-head"
+            id="candidates-label"
+            style="display: none"
+          >
+            Other Parameters
+          </div>
+          <div class="candidates-row" id="candidates-row"></div>
+        </div>
+
+        <div id="state-error" class="state">
+          <div class="error-tag" id="error-tag">No Match Found</div>
+          <div class="error-msg" id="error-msg">
+            No designs met the criteria.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section class="about-section">
+      <div class="about-inner">
+        <div class="about-left">
+          <div class="about-kicker">Final Year Project</div>
+          <div class="about-title">
+            NUMERICAL AND MACHINE LEARNING APPROACH TO OPTIMIZE SHELL AND TUBE
+            HEAT EXCHANGER IN CHEMICAL INDUSTRIES
+          </div>
+          <div class="about-desc">
+            <p>
+              This project focuses on optimizing the performance of a shell and
+              tube heat exchanger (STHE) using a hybrid approach that combines
+              Computational Fluid Dynamics (CFD) and Machine Learning (ML).
+              Initially, a detailed 3D CAD model of the heat exchanger is
+              developed and analyzed using CFD simulations to study fluid flow
+              behavior, temperature distribution, and pressure drop under
+              various operating conditions.
+            </p>
+            <br />
+            <p>
+              The simulation data generated from multiple parametric studies is
+              used to build a dataset linking design parameters with performance
+              outputs such as heat transfer rate and pressure loss. A Machine
+              Learning model, specifically a Random Forest Regressor, is trained
+              on this dataset to predict thermal performance accurately without
+              the need for repeated simulations.
+            </p>
+            <br />
+            <p>
+              The integrated CFD - ML framework enables faster evaluation of
+              design configurations and supports optimization by identifying
+              parameter combinations that maximize heat transfer efficiency
+              while minimizing pressure drop. This approach significantly
+              reduces computational cost and provides a scalable solution for
+              heat exchanger design in chemical industries.
+            </p>
+          </div>
+        </div>
+        <div class="about-meta">
+          <div class="meta-block">
+            <div class="meta-label">Students</div>
+            <div class="meta-value">
+              Kishore S P
+              <span>2116221101050</span>
+            </div>
+            <div class="meta-value" style="margin-top: 0.5rem">
+              Manovikram K
+              <span>2116221101055</span>
+            </div>
+          </div>
+          <div class="meta-block">
+            <div class="meta-label">Guide</div>
+            <div class="meta-value">Dr. P. Chandrasekar</div>
+          </div>
+          <div class="meta-block">
+            <div class="meta-label">Year</div>
+            <div class="meta-value">2022 - 2026</div>
+          </div>
+
+          <div class="meta-block">
+            <div class="meta-label">Department</div>
+            <div class="meta-value">B.E. Mechanical Engineering</div>
+          </div>
+          <div class="meta-block">
+            <div class="meta-label">Institution</div>
+            <div class="meta-value">
+              Rajalakshmi Engineering College, Chennai
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ────────────────────────────────────────────── -->
+    <footer>
+      <div class="footer-names">
+        <div class="footer-space">ML Model Deployed on Hugging Face</div>
+        <!-- <div class="footer-name">
+          Kishore S P
+          <span>221101050</span>
+        </div>
+        <div class="footer-name">
+          Manovikram K
+          <span>221101055</span>
+        </div> -->
+      </div>
+      <div class="footer-space">manov-ik/nml-opti-sthe</div>
+    </footer>
+
+    <!-- ── Gradio JS Client (ESM) ──────────────────────────────────── -->
+    <script type="module">
+      import { Client } from "https://esm.sh/@gradio/client";
+
+      const SPACE = "manov-ik/nml-opti-sthe";
+
+      const PARAM_META = {
+        tube_fluid: { label: "Tube Fluid", unit: "", fmt: "str" },
+        shell_fluid: { label: "Shell Fluid", unit: "", fmt: "str" },
+        shell_diameter: { label: "Shell Diameter", unit: "m", fmt: "4dp" },
+        tube_outer_diameter: { label: "Tube Outer Ø", unit: "m", fmt: "4dp" },
+        tube_inner_diameter: { label: "Tube Inner Ø", unit: "m", fmt: "4dp" },
+        tube_length: { label: "Tube Length", unit: "m", fmt: "3dp" },
+        number_of_tubes: { label: "No. of Tubes", unit: "", fmt: "int" },
+        tube_pitch: { label: "Tube Pitch", unit: "m", fmt: "4dp" },
+        baffle_spacing: { label: "Baffle Spacing", unit: "m", fmt: "3dp" },
+        number_of_baffles: { label: "No. of Baffles", unit: "", fmt: "int" },
+        tube_mass_flow_rate: {
+          label: "Tube Mass Flow",
+          unit: "kg/s",
+          fmt: "2dp",
+        },
+        shell_mass_flow_rate: {
+          label: "Shell Mass Flow",
+          unit: "kg/s",
+          fmt: "2dp",
+        },
+        tube_inlet_temp: { label: "Tube Inlet Temp", unit: "K", fmt: "1dp" },
+        tube_outlet_temp: { label: "Tube Outlet Temp", unit: "K", fmt: "1dp" },
+        shell_inlet_temp: { label: "Shell Inlet Temp", unit: "K", fmt: "1dp" },
+        shell_outlet_temp: {
+          label: "Shell Outlet Temp",
+          unit: "K",
+          fmt: "1dp",
+        },
+        tube_thermal_conductivity: {
+          label: "Conductivity",
+          unit: "W/mK",
+          fmt: "mat",
+        },
+      };
+
+      const MATERIAL = { 16: "Steel", 205: "Aluminium", 385: "Copper" };
+      const DISPLAY_ORDER = Object.keys(PARAM_META);
+
+      function formatVal(key, val) {
+        if (val == null) return "—";
+        const m = PARAM_META[key];
+        if (!m || m.fmt === "str") return String(val);
+        if (m.fmt === "mat") {
+          const n = Math.round(val);
+          return `${n} (${MATERIAL[n] || "custom"})`;
+        }
+        if (m.fmt === "int") return String(Math.round(val));
+        const dp = { "4dp": 4, "3dp": 3, "2dp": 2, "1dp": 1 }[m.fmt] ?? 2;
+        return m.unit
+          ? `${Number(val).toFixed(dp)} ${m.unit}`
+          : Number(val).toFixed(dp);
+      }
+
+      function setState(name) {
+        ["idle", "loading", "result", "error"].forEach((s) => {
+          document
+            .getElementById(`state-${s}`)
+            .classList.toggle("active", s === name);
+        });
+        const bar = document.getElementById("loading-bar");
+        name === "loading"
+          ? bar.classList.add("active")
+          : bar.classList.remove("active");
+      }
+
+      function animateQ(el, target, ms = 1200) {
+        const t0 = performance.now();
+        (function step(now) {
+          const p = Math.min((now - t0) / ms, 1);
+          const e = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(e * target).toLocaleString();
+          if (p < 1) requestAnimationFrame(step);
+        })(t0);
+      }
+
+      function g(id) {
+        return document.getElementById(id);
+      }
+      function optNum(id) {
+        const v = g(id).value.trim();
+        return v === "" ? null : parseFloat(v);
+      }
+
+      function buildPayload() {
+        const cond = g("tube_thermal_conductivity").value;
+        return {
+          tube_fluid: g("tube_fluid").value,
+          shell_fluid: g("shell_fluid").value,
+          target_Q: parseFloat(g("target_Q").value) || 0,
+          n_trials: parseInt(g("n_trials").value) || 1000,
+          shell_diameter: optNum("shell_diameter"),
+          tube_outer_diameter: optNum("tube_outer_diameter"),
+          tube_inner_diameter: optNum("tube_inner_diameter"),
+          tube_length: optNum("tube_length"),
+          number_of_tubes: optNum("number_of_tubes"),
+          tube_pitch: optNum("tube_pitch"),
+          baffle_spacing: optNum("baffle_spacing"),
+          number_of_baffles: optNum("number_of_baffles"),
+          tube_mass_flow_rate: optNum("tube_mass_flow_rate"),
+          shell_mass_flow_rate: optNum("shell_mass_flow_rate"),
+          tube_inlet_temp: optNum("tube_inlet_temp"),
+          tube_outlet_temp: optNum("tube_outlet_temp"),
+          shell_inlet_temp: optNum("shell_inlet_temp"),
+          shell_outlet_temp: optNum("shell_outlet_temp"),
+          tube_thermal_conductivity: cond === "auto" ? null : parseFloat(cond),
+        };
+      }
+
+      function renderResult(data, originalCandidates) {
+        if (!data || data.status === "no_match") {
+          g("error-msg").textContent =
+            data?.message || "No designs met the criteria.";
+          setState("error");
+          return;
+        }
+
+        const best = data.candidates[0];
+        const optimized = new Set(data.optimized_params || []);
+
+        setState("result");
+        animateQ(g("result-q"), best.Q_pred);
+
+        const tbody = g("breakdown-table");
+        tbody.innerHTML = "";
+        DISPLAY_ORDER.forEach((key) => {
+          if (!(key in best)) return;
+          const isAI = optimized.has(key);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${PARAM_META[key]?.label ?? key}</td>
+            <td>${formatVal(key, best[key])}</td>
+            <td><span class="badge ${isAI ? "badge-ai" : "badge-you"}">${isAI ? "AI" : "you"}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const row = g("candidates-row");
+        const label = g("candidates-label");
+        row.innerHTML = "";
+
+        // Always keep the full original list so swapping never loses any candidate
+        const all = originalCandidates ?? data.candidates;
+        const active = data.candidates[0];
+        const others = all.filter((x) => x !== active);
+
+        if (others.length > 0) {
+          label.style.display = "block";
+          others.forEach((c) => {
+            // Rank is its position in the original list (1-based)
+            const rank = all.indexOf(c) + 1;
+            const card = document.createElement("div");
+            card.className = "candidate-card";
+            card.innerHTML = `
+              <div class="candidate-rank">Parameter #${rank}</div>
+              <div class="candidate-q">${Math.round(c.Q_pred).toLocaleString()} W</div>
+            `;
+            card.onclick = () => {
+              // Swap clicked candidate to front; keep all others intact
+              const swapped = {
+                ...data,
+                candidates: [c, ...all.filter((x) => x !== c)],
+              };
+              renderResult(swapped, all);
+            };
+            row.appendChild(card);
+          });
+        } else {
+          label.style.display = "none";
+        }
+      }
+
+      async function runPrediction() {
+        const btn = g("predict-btn");
+        btn.disabled = true;
+        setState("loading");
+
+        try {
+          const client = await Client.connect(SPACE);
+          const result = await client.predict(
+            "/process_request",
+            buildPayload(),
+          );
+          const data = result.data[0];
+
+          if (data && data.status === "ok") {
+            renderResult(data, null);
+          } else if (data && data.status === "no_match") {
+            g("error-msg").textContent = data.message;
+            setState("error");
+          } else {
+            throw new Error("Unexpected response from model");
+          }
+        } catch (err) {
+          console.error(err);
+          g("error-tag").textContent = "Connection Error";
+          g("error-msg").textContent = err.message.includes("Failed to fetch")
+            ? "Could not reach the HF Space. Make sure the Space is running and not sleeping."
+            : `Error: ${err.message}`;
+          setState("error");
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      window.runPrediction = runPrediction;
+      setState("idle");
+    </script>
+  </body>
+</html>
